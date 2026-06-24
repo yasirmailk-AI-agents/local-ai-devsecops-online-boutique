@@ -1,4 +1,30 @@
-pipeline {
+stage('SonarQube Analysis') {
+    steps {
+        script {
+            def scannerHome = tool 'SonarScanner'
+
+            withSonarQubeEnv('SonarQube') {
+                sh """
+                    ${scannerHome}/bin/sonar-scanner \
+                      -Dsonar.projectKey=online-boutique \
+                      -Dsonar.projectName="Online Boutique" \
+                      -Dsonar.sources=src \
+                      -Dsonar.sourceEncoding=UTF-8 \
+                      -Dsonar.exclusions=**/node_modules/**,**/vendor/**,**/generated/**,**/dist/**,**/build/**
+                """
+            }
+        }
+    }
+}
+
+stage('SonarQube Quality Gate') {
+    steps {
+        timeout(time: 10, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: true
+        }
+    }
+}
+stage('Build Frontend Image')pipeline {
   agent any
 
   options {
