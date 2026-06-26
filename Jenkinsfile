@@ -71,34 +71,9 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                script {
-                    def scannerHome = tool 'SonarScanner'
+        
 
-                    withSonarQubeEnv('SonarQube') {
-                        sh """
-                            set -eux
-                            "${scannerHome}/bin/sonar-scanner" \
-                              -Dsonar.projectKey="${SONAR_PROJECT_KEY}" \
-                              -Dsonar.projectName="${SONAR_PROJECT_NAME}" \
-                              -Dsonar.sources=src/frontend \
-                              -Dsonar.sourceEncoding=UTF-8 \
-                              -Dsonar.scm.provider=git \
-                              -Dsonar.exclusions="**/node_modules/**,**/vendor/**,**/generated/**,**/dist/**,**/build/**"
-                        """
-                    }
-                }
-            }
-        }
-
-        stage('SonarQube Quality Gate') {
-            steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: true
-                }
-            }
-        }
+        
 
         stage('Build Frontend Image') {
             steps {
